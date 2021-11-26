@@ -1,28 +1,16 @@
 import type { LoaderFunction } from "remix";
 import { useLoaderData, json } from "remix";
+import { db } from "~/utils/db.server";
+
 type ResumeData = {
-  skills: Array<string>;
+  skills: Array<{ name: string | null, sort: number }>;
 };
 
-export const loader: LoaderFunction = () => {
+export const loader: LoaderFunction = async () => {
   const data: ResumeData = {
-    skills: [
-      'JavaScript',
-      'CSS/HTML',
-      'React',
-      'Vue',
-      'Angular',
-      'NodeJS',
-      'Ruby',
-      'PHP',
-      'Perl',
-      'Git',
-      'Docker',
-      'AWS',
-      'Remix'
-    ]
+    skills: await db.skills.findMany()
   };
-  return json(data);
+  return data;
 }
 
 export default function ResumeIndex() {
@@ -36,7 +24,7 @@ export default function ResumeIndex() {
       </p>
       <p>
         {resume.skills.map((skill, index) => (
-          <span>{index !== 0 ? ', ' : ''}{skill}</span>
+          <span>{index !== 0 ? ', ' : ''}{skill.name}</span>
         ))}
       </p>
     </div>
